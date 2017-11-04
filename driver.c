@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-
+#include <stdlib.h>
 #include "as.h"
 #include "opcode.h"
 #include "vm.h"
@@ -16,11 +16,13 @@ typedef enum {
 } req_t;
 
 #define help_text                                                           \
-    "Usage: as_exec [-w] [-x] [-o <out_file>] <in_file>\n"                  \
+    "Usage: as_exec [-w] [-x] [-o <out_file>] <in_file> [--input"           \
+    "<int>]\n"                                                              \
     "       -w Assemble <in_file> and write to an ELF file, see -o below\n" \
     "       -o if -w is specifed, <out_file> is used to store the object "  \
     "code\n"                                                                \
     "       -x Load <in_file> and execute it\n"                             \
+    "       --input set a parameter N in Fib(N)\n"                          \
     "\n"                                                                    \
     "       <in_file> the file name to be used by commands above"
 
@@ -54,6 +56,12 @@ int main(int argc, char **argv)
             if (req == ASSEMBLE_AND_WRITE_ELF)
                 FATAL(-1, "-w and -x used together, see -h\n");
             req = LOAD_ELF_AND_EVAL;
+        } else if (!strcmp(argv[i], "--input")) {
+            if (!argv[i + 1])
+                FATAL(-1, "Fib(N) need int as a parameter , see -h\n");
+            if (req == LOAD_ELF_AND_EVAL)
+                FATAL(-1, "-x and --input used together, see -h\n");
+            int Fib_N = atoi(argv[++i]);
         } else if (!strcmp(argv[i], "-")) {
             if (in_file)
                 FATAL(-1, "more than one input file, see -h\n");
