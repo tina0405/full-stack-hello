@@ -260,11 +260,14 @@ static void assemble_line(vm_env *env, char *line)
     free(line_backup);
 }
 
-void assemble_from_fd(vm_env *env, int fd, int input)
+void assemble_from_fd(vm_env *env, int fd, int input, int error)
 {
     char *line = NULL;
     size_t size = 0;
     FILE *fp = fdopen(fd, "r");
+    char str[20];                        /* INT_MAX = 2147483647 */
+    sprintf(str, "or #5 $%d #5", error); /* register_5 for error input */
+    assemble_line(env, str);
     if (input != -1) {
         char str[20]; /* INT_MAX = 2147483647 */
         sprintf(str, "or #0 $%d #0", input);
