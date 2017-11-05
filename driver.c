@@ -33,7 +33,8 @@ int main(int argc, char **argv)
     char *out_file = NULL;
     int ignore_option = 0;
     int out_fd = -1;
-    int in_fd = -1;
+    int in_fd = -1; /*if not input*/
+    int Fib_N = -1; /*if not input*/
 
     for (int i = 1; i < argc; i++) {
         if (ignore_option)
@@ -57,11 +58,9 @@ int main(int argc, char **argv)
                 FATAL(-1, "-w and -x used together, see -h\n");
             req = LOAD_ELF_AND_EVAL;
         } else if (!strcmp(argv[i], "--input")) {
-            if (!argv[i + 1])
-                FATAL(-1, "Fib(N) need int as a parameter , see -h\n");
             if (req == LOAD_ELF_AND_EVAL)
                 FATAL(-1, "-x and --input used together, see -h\n");
-            int Fib_N = atoi(argv[++i]);
+            Fib_N = atoi(argv[++i]);
         } else if (!strcmp(argv[i], "-")) {
             if (in_file)
                 FATAL(-1, "more than one input file, see -h\n");
@@ -112,7 +111,7 @@ int main(int argc, char **argv)
     switch (req) {
     case ASSEMBLE_AND_EVAL: {
         vm_env *env = vm_new();
-        assemble_from_fd(env, in_fd);
+        assemble_from_fd(env, in_fd, Fib_N);
         hook_opcodes(env);
         vm_run(env);
         vm_free(env);
@@ -122,7 +121,7 @@ int main(int argc, char **argv)
         int len;
 
         vm_env *env = vm_new();
-        assemble_from_fd(env, in_fd);
+        assemble_from_fd(env, in_fd, Fib_N);
         len = write_to_elf(env, out_fd);
         vm_free(env);
         if (len < 0)
