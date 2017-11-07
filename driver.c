@@ -33,9 +33,9 @@ int main(int argc, char **argv)
     char *out_file = NULL;
     int ignore_option = 0;
     int out_fd = -1;
-    int in_fd = -1; /*if not input*/
-    int Fib_N = -1; /*if not input*/
-    int error_N = 0;
+    int in_fd = -1;  /*if not input*/
+    int Fib_N = -1;  /*if not input*/
+    int error_N = 0; /*error signal for assembly*/
 
     for (int i = 1; i < argc; i++) {
         if (ignore_option)
@@ -61,9 +61,9 @@ int main(int argc, char **argv)
         } else if (!strcmp(argv[i], "--input")) {
             if (req == LOAD_ELF_AND_EVAL)
                 FATAL(-1, "-x and --input used together, see -h\n");
-            i++;
-            for (int k = 0; k < strlen(argv[i]); k++) {
-                if (argv[i][k] <= 48 || argv[i][k] >= 57) {
+            int len = strlen(argv[++i]);
+            for (int k = 0; k < len; k++) {
+                if (argv[i][k] < 48 || argv[i][k] > 57) {
                     error_N = 1; /*error signal for assembly*/
                     break;
                 }
